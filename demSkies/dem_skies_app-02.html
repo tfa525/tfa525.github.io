@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dem Skies</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                background: linear-gradient(
+                    181deg,
+                    #0a1026 0%,
+                    #121a34 68%,
+                    #1d2742 76%,
+                    #333e5d 82%,
+                    #4e5b73 88%,
+                    #656d7a 91%,
+                    #9e613c 94%,
+                    #713125 96%,
+                    #361114 98%,
+                    #020203 100%
+                );
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px;
+            }
+
+            .container {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                border-radius: 30px;
+                padding: 40px;
+                max-width: 600px;
+                width: 100%;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            @media (max-width: 600px) {
+                .container {
+                    padding: 20px;
+                    border-radius: 20px;
+                }
+            }
+
+            h1 {
+                color: white;
+                text-align: center;
+                margin-bottom: 30px;
+                font-size: 2.5em;
+            }
+
+            @media (max-width: 600px) {
+                h1 {
+                    font-size: 2em;
+                    margin-bottom: 20px;
+                }
+            }
+
+            .search-box {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 30px;
+            }
+
+            input {
+                flex: 1;
+                padding: 15px 20px;
+                border: none;
+                border-radius: 15px;
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                font-size: 16px;
+                outline: none;
+            }
+
+            input::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            button {
+                padding: 15px 30px;
+                border: none;
+                border-radius: 15px;
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            button:hover {
+                background: rgba(255, 255, 255, 0.4);
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .info {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.8);
+                margin-bottom: 20px;
+                font-size: 14px;
+            }
+
+            .loading,
+            .error,
+            .placeholder {
+                text-align: center;
+                color: white;
+                padding: 40px 20px;
+                font-size: 18px;
+            }
+
+            .error {
+                background: rgba(239, 68, 68, 0.3);
+                border-radius: 15px;
+                padding: 20px;
+            }
+
+            .weather {
+                color: white;
+            }
+
+            .location {
+                text-align: center;
+                font-size: 28px;
+                font-weight: bold;
+                margin-bottom: 30px;
+            }
+
+            .main-temp {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .temperature {
+                font-size: 72px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+
+            @media (max-width: 600px) {
+                .temperature {
+                    font-size: 56px;
+                }
+            }
+
+            .description {
+                font-size: 24px;
+                text-transform: capitalize;
+                opacity: 0.9;
+            }
+
+            @media (max-width: 600px) {
+                .description {
+                    font-size: 20px;
+                }
+            }
+
+            .details {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            @media (max-width: 600px) {
+                .details {
+                    grid-template-columns: 1fr;
+                    gap: 10px;
+                }
+            }
+
+            .details-three {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            @media (max-width: 600px) {
+                .details-three {
+                    grid-template-columns: 1fr;
+                    gap: 10px;
+                }
+            }
+
+            .detail-card {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            @media (max-width: 600px) {
+                .detail-card {
+                    padding: 15px;
+                }
+            }
+
+            .detail-label {
+                font-size: 14px;
+                opacity: 0.8;
+                margin-bottom: 8px;
+            }
+
+            .detail-value {
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            .footer {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                margin-top: 30px;
+                font-size: 12px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 24px;
+                margin: 30px 0 15px 0;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            @media (max-width: 600px) {
+                .section-title {
+                    font-size: 20px;
+                    margin: 20px 0 10px 0;
+                }
+            }
+
+            .tabs {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .tab {
+                flex: 1;
+                padding: 12px 20px;
+                background: transparent;
+                color: rgba(255, 255, 255, 0.7);
+                border: none;
+                border-bottom: 3px solid transparent;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+
+            .tab:hover {
+                color: white;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .tab.active {
+                color: white;
+                border-bottom-color: white;
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+            .image-container {
+                width: 90%;
+                margin: 0 auto;
+                display: flex;
+  justify-content: space-between; /* Or space-around, space-evenly, center, etc. */
+  /* Optional: Add some spacing around the images themselves */
+  gap: 10px; 
+            }
+            .image-container img {
+                height: 75px;
+                width: auto;
+            }
+
+            @media (max-width: 600px) {
+                .tab {
+                    padding: 10px 12px;
+                    font-size: 14px;
+                }
+                .image-container img {
+                    height: 50px;
+                width: auto;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="image-container">
+                <img src="cloud.png" alt="" />
+                <img src="lightning2.png" alt="" />
+                <img src="sol.png" alt="" />
+                <img src="luna.png" alt="" />
+                <img src="starfield.png" alt="" />
+            </div>
+            <h1>Dem Skies</h1>
+
+            <div class="search-box" style="clear: both">
+                <input type="text" id="cityInput" placeholder="Enter city name or ZIP code..." maxlength="100" />
+                <button id="searchBtn">Search</button>
+            </div>
+
+            <div class="info">Try: Milton FL, 34638, Tampa, London</div>
+
+            <div id="loading" class="loading hidden">Loading weather data...</div>
+
+            <div id="error" class="error hidden"></div>
+
+            <div id="placeholder" class="placeholder">🔍 Enter a city name or ZIP code to see weather</div>
+
+            <div id="weather" class="weather hidden"></div>
+
+            <div class="footer">Powered by WeatherAPI.com</div>
+        </div>
+
+        <script>
+            const cityInput = document.getElementById("cityInput");
+            const searchBtn = document.getElementById("searchBtn");
+            const loading = document.getElementById("loading");
+            const error = document.getElementById("error");
+            const placeholder = document.getElementById("placeholder");
+            const weather = document.getElementById("weather");
+            const API_KEY = "3e63ad04ae2a4cc8812173245261901";
+
+            function show(element) {
+                element.classList.remove("hidden");
+            }
+
+            function hide(element) {
+                element.classList.add("hidden");
+            }
+
+            function showError(message) {
+                error.textContent = message;
+                hide(loading);
+                hide(weather);
+                hide(placeholder);
+                show(error);
+            }
+
+            function getMoonPhase(date) {
+                const year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                const day = date.getDate();
+
+                let yearCopy = year;
+                if (month < 3) {
+                    yearCopy--;
+                    month += 12;
+                }
+
+                ++month;
+                const c = 365.25 * yearCopy;
+                const e = 30.6 * month;
+                let jd = c + e + day - 694039.09;
+                jd /= 29.5305882;
+                let b = parseInt(jd);
+                jd -= b;
+                b = Math.round(jd * 8);
+
+                if (b >= 8) b = 0;
+
+                const phases = [
+                    { name: "🌑 New Moon", emoji: "🌑" },
+                    { name: "🌒 Waxing Crescent", emoji: "🌒" },
+                    { name: "🌓 First Quarter", emoji: "🌓" },
+                    { name: "🌔 Waxing Gibbous", emoji: "🌔" },
+                    { name: "🌕 Full Moon", emoji: "🌕" },
+                    { name: "🌖 Waning Gibbous", emoji: "🌖" },
+                    { name: "🌗 Last Quarter", emoji: "🌗" },
+                    { name: "🌘 Waning Crescent", emoji: "🌘" }
+                ];
+
+                return phases[b];
+            }
+
+            function getAstronomyEvents() {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const events = [
+                    { type: 'Quadrantid Meteor Shower', date: new Date('2026-01-03'), description: 'Brief but intense meteor shower' },
+                { type: 'Venus-Saturn Conjunction', date: new Date('2026-01-18'), description: 'Venus and Saturn appear very close in evening sky' },
+                { type: 'Supermoon', date: new Date('2026-02-06'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Mars-Jupiter Conjunction', date: new Date('2026-02-13'), description: 'Mars and Jupiter align in pre-dawn sky' },
+                { type: 'Mercury at Greatest Elongation', date: new Date('2026-02-21'), description: 'Best time to observe Mercury in evening sky' },
+                { type: 'Supermoon', date: new Date('2026-03-08'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Venus-Jupiter Conjunction', date: new Date('2026-03-12'), description: 'Bright pairing of two brightest planets' },
+                { type: 'Blue Moon', date: new Date('2026-03-31'), description: 'Second full moon in a calendar month' },
+                { type: 'Supermoon', date: new Date('2026-04-06'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Lyrids Meteor Shower', date: new Date('2026-04-22'), description: 'Ancient meteor shower with occasional bright fireballs' },
+                { type: 'Mercury-Venus Conjunction', date: new Date('2026-05-04'), description: 'Mercury and Venus meet in evening twilight' },
+                { type: 'Eta Aquarids Meteor Shower', date: new Date('2026-05-06'), description: 'Debris from Halley\'s Comet' },
+                { type: 'Saturn at Opposition', date: new Date('2026-05-15'), description: 'Saturn at its brightest, visible all night' },
+                { type: 'Strawberry Moon', date: new Date('2026-06-03'), description: 'Full moon of June, named by Native Americans' },
+                { type: 'Mars-Saturn Conjunction', date: new Date('2026-06-20'), description: 'Mars and Saturn align in morning sky' },
+                { type: 'Buck Moon', date: new Date('2026-07-03'), description: 'Full moon of July, when deer grow new antlers' },
+                { type: 'Jupiter at Opposition', date: new Date('2026-07-12'), description: 'Jupiter at its closest and brightest' },
+                { type: 'Mercury at Greatest Elongation', date: new Date('2026-07-24'), description: 'Best morning viewing of Mercury' },
+                { type: 'Perseids Meteor Shower', date: new Date('2026-08-12'), description: 'One of the best meteor showers of the year' },
+                { type: 'Total Solar Eclipse', date: new Date('2026-08-12'), description: 'Visible from Arctic, Greenland, Iceland, Spain' },
+                { type: 'Mars at Opposition', date: new Date('2026-08-28'), description: 'Mars at its closest approach to Earth' },
+                { type: 'Harvest Moon', date: new Date('2026-09-01'), description: 'Full moon closest to autumn equinox' },
+                { type: 'Supermoon', date: new Date('2026-09-01'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Venus-Mars Conjunction', date: new Date('2026-09-16'), description: 'Venus and Mars appear close together' },
+                { type: 'Supermoon', date: new Date('2026-09-30'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Hunter\'s Moon', date: new Date('2026-09-30'), description: 'First full moon after Harvest Moon' },
+                { type: 'Mercury-Venus Conjunction', date: new Date('2026-10-10'), description: 'Two inner planets meet at dusk' },
+                { type: 'Orionids Meteor Shower', date: new Date('2026-10-21'), description: 'Another debris trail from Halley\'s Comet' },
+                { type: 'Supermoon', date: new Date('2026-10-30'), description: 'Full moon at closest approach to Earth' },
+                { type: 'Beaver Moon', date: new Date('2026-10-30'), description: 'Full moon when beavers build winter lodges' },
+                { type: 'Venus at Greatest Elongation', date: new Date('2026-11-06'), description: 'Best time to observe Venus in evening sky' },
+                { type: 'Leonids Meteor Shower', date: new Date('2026-11-17'), description: 'Known for producing meteor storms' },
+                { type: 'Cold Moon', date: new Date('2026-11-28'), description: 'Full moon of November, winter approaches' },
+                { type: 'Jupiter-Saturn Conjunction', date: new Date('2026-12-05'), description: 'Two giant planets align' },
+                { type: 'Geminids Meteor Shower', date: new Date('2026-12-14'), description: 'Brightest and most reliable meteor shower' },
+                { type: 'Mercury at Greatest Elongation', date: new Date('2026-12-20'), description: 'Best evening viewing of Mercury' },
+                { type: 'Ursids Meteor Shower', date: new Date('2026-12-22'), description: 'Winter meteor shower near solstice' },
+                { type: 'Wolf Moon', date: new Date('2026-12-28'), description: 'Full moon of December, named for howling wolves' },
+                { type: 'Quadrantids Meteor Shower', date: new Date('2027-01-03'), description: 'First major meteor shower of the year' },
+                { type: 'Mars-Jupiter Conjunction', date: new Date('2027-01-15'), description: 'Mars and Jupiter close approach' },
+                { type: 'Snow Moon', date: new Date('2027-01-26'), description: 'Full moon of January, heaviest snows' },
+                { type: 'Total Lunar Eclipse', date: new Date('2027-02-20'), description: 'Visible from Americas, Europe, Africa, Asia' },
+                { type: 'Worm Moon', date: new Date('2027-02-25'), description: 'Full moon of February, earthworms return' },
+                { type: 'Saturn at Opposition', date: new Date('2027-03-18'), description: 'Saturn at its brightest for the year' },
+                { type: 'Pink Moon', date: new Date('2027-03-27'), description: 'Full moon of March, first spring flowers' },
+                { type: 'Venus-Jupiter Conjunction', date: new Date('2027-04-10'), description: 'Spectacular pairing of brightest planets' },
+                { type: 'Flower Moon', date: new Date('2027-04-25'), description: 'Full moon of April, flowers in full bloom' },
+                { type: 'Annular Solar Eclipse', date: new Date('2027-08-02'), description: 'Visible from Spain, North Africa, Middle East' }
+                ];
+
+                const filtered = events.filter((e) => e.date >= today);
+                return filtered.sort((a, b) => a.date - b.date);
+            }
+
+            async function fetchWeather(city) {
+                if (!city.trim()) {
+                    showError("Please enter a city name or ZIP code");
+                    return;
+                }
+
+                hide(error);
+                hide(weather);
+                hide(placeholder);
+                show(loading);
+                searchBtn.disabled = true;
+
+                try {
+                    const input = city.trim();
+                    console.log("=== Starting search for:", input);
+
+                    const zipRegex = /^\d{5}(-\d{4})?$/;
+                    const isZip = zipRegex.test(input);
+                    console.log("Is ZIP code:", isZip);
+
+                    let weatherResponse;
+
+                    if (isZip) {
+                        // For ZIP codes, use search API to find US location
+                        console.log("Searching for US ZIP code...");
+                        const searchUrl = `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${encodeURIComponent(input)}`;
+                        const searchResponse = await fetch(searchUrl);
+
+                        if (searchResponse.ok) {
+                            const searchResults = await searchResponse.json();
+                            console.log("Search results:", searchResults);
+
+                            if (searchResults && searchResults.length > 0) {
+                                // Filter for US locations
+                                let usLocation = searchResults.find(
+                                    (r) =>
+                                        r.country === "United States" ||
+                                        r.country === "USA" ||
+                                        r.country === "United States of America"
+                                );
+
+                                const bestMatch = usLocation || searchResults[0];
+                                console.log("Using location:", bestMatch.name, bestMatch.region, bestMatch.country);
+
+                                const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${bestMatch.lat},${bestMatch.lon}&days=6&aqi=no&alerts=no`;
+                                weatherResponse = await fetch(weatherUrl);
+                            } else {
+                                throw new Error(`ZIP code "${input}" not found`);
+                            }
+                        } else {
+                            throw new Error("Unable to search for ZIP code");
+                        }
+                    } else {
+                        // For city names, direct fetch
+                        console.log("Fetching weather for city...");
+                        const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(input)}&days=6&aqi=no&alerts=no`;
+                        weatherResponse = await fetch(weatherUrl);
+                    }
+
+                    if (!weatherResponse.ok) {
+                        if (weatherResponse.status === 400) {
+                            throw new Error(`Location "${input}" not found`);
+                        }
+                        throw new Error("Unable to fetch weather data");
+                    }
+
+                    const data = await weatherResponse.json();
+                    console.log("✓ Weather data received");
+
+                    const location = data.location;
+                    const current = data.current;
+                    const forecast = data.forecast.forecastday;
+
+                    const today = new Date();
+                    const moonPhase = getMoonPhase(today);
+                    const astronomyEvents = getAstronomyEvents();
+
+                    const forecastData = [];
+                    for (let i = 1; i < forecast.length && i <= 5; i++) {
+                        const day = forecast[i];
+                        const date = new Date(day.date);
+                        const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+                        forecastData.push({
+                            day: dayName,
+                            high: Math.round(day.day.maxtemp_f),
+                            low: Math.round(day.day.mintemp_f),
+                            description: day.day.condition.text
+                        });
+                    }
+
+                    const todayForecast = forecast[0];
+
+                    displayWeather({
+                        location: `${location.name}, ${location.region}, ${location.country}`,
+                        temp: Math.round(current.temp_f),
+                        tempC: Math.round(current.temp_c),
+                        feelsLike: Math.round(current.feelslike_f),
+                        humidity: current.humidity,
+                        description: current.condition.text,
+                        sunrise: todayForecast.astro.sunrise,
+                        sunset: todayForecast.astro.sunset,
+                        tempMax: Math.round(todayForecast.day.maxtemp_f),
+                        tempMin: Math.round(todayForecast.day.mintemp_f),
+                        forecast: forecastData,
+                        moonPhase: moonPhase,
+                        astronomyEvents: astronomyEvents
+                    });
+                } catch (err) {
+                    console.error("Error:", err);
+                    showError(err.message);
+                } finally {
+                    hide(loading);
+                    searchBtn.disabled = false;
+                }
+            }
+
+            function displayWeather(data) {
+                let astronomyHTML = "";
+                if (data.astronomyEvents && data.astronomyEvents.length > 0) {
+                    const eventsToShow = data.astronomyEvents.slice(0, 4);
+                    astronomyHTML = eventsToShow
+                        .map((event) => {
+                            const dateStr = event.date.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+                            return `
+                    <div class="detail-card" style="margin-bottom: 10px;">
+                        <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px;">${event.type}</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 3px;">${dateStr}</div>
+                        <div style="font-size: 13px; opacity: 0.75;">${event.description}</div>
+                    </div>
+                    `;
+                        })
+                        .join("");
+                } else {
+                    astronomyHTML =
+                        '<div style="text-align: center; padding: 20px; opacity: 0.7;">No upcoming events</div>';
+                }
+
+                weather.innerHTML = `
+                <div class="location">${data.location}</div>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('current')">Current</button>
+                    <button class="tab" onclick="switchTab('forecast')">Forecast</button>
+                    <button class="tab" onclick="switchTab('astronomy')">Astronomy</button>
+                </div>
+                
+                <div id="tab-current" class="tab-content active">
+                    <div class="main-temp">
+                        <div class="temperature">${data.temp}°F</div>
+                        <div class="description">${data.description}</div>
+                        <div style="margin-top: 10px; opacity: 0.8;">(${data.tempC}°C)</div>
+                    </div>
+                    
+                    <div class="details-three">
+                        <div class="detail-card">
+                            <div class="detail-label">💧 Humidity</div>
+                            <div class="detail-value">${data.humidity}%</div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-label">🌡️ Feels Like</div>
+                            <div class="detail-value">${data.feelsLike}°F</div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-label">${data.moonPhase.emoji} Moon</div>
+                            <div class="detail-value" style="font-size: 16px;">${data.moonPhase.name.replace(data.moonPhase.emoji + " ", "")}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="details">
+                        <div class="detail-card">
+                            <div class="detail-label">🌅 Sunrise</div>
+                            <div class="detail-value" style="font-size: 18px;">${data.sunrise}</div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-label">🌇 Sunset</div>
+                            <div class="detail-value" style="font-size: 18px;">${data.sunset}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>High: ${data.tempMax}°F</span>
+                            <span>Low: ${data.tempMin}°F</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-forecast" class="tab-content">
+                    <div class="section-title">📅 5-Day Forecast</div>
+                    ${data.forecast
+                        .map(
+                            (day) => `
+                        <div class="detail-card" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: bold; font-size: 18px;">${day.day}</div>
+                                    <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">${day.description}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 20px; font-weight: bold;">${day.high}°</div>
+                                    <div style="font-size: 16px; opacity: 0.7;">${day.low}°</div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                        )
+                        .join("")}
+                </div>
+                
+                <div id="tab-astronomy" class="tab-content">
+                    <div class="section-title">🌟 Next 4 Astronomy Events</div>
+                    ${astronomyHTML}
+                </div>
+            `;
+
+                hide(placeholder);
+                hide(error);
+                show(weather);
+            }
+
+            window.switchTab = function (tabName) {
+                document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach((content) => content.classList.remove("active"));
+
+                event.target.classList.add("active");
+                document.getElementById("tab-" + tabName).classList.add("active");
+            };
+
+            searchBtn.addEventListener("click", () => {
+                fetchWeather(cityInput.value);
+            });
+
+            cityInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    fetchWeather(cityInput.value);
+                }
+            });
+        </script>
+    </body>
+</html>
