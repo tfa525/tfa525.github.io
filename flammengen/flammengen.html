@@ -11,10 +11,13 @@
             overflow: hidden;
             font-family: Arial, sans-serif;
             font-size: 1.3em;
+            background-color: black;
         }
         #container {
-            width: 100vw;
-            height: 100vh;
+            position: absolute;
+            margin: 5vh 5vw;
+            width: 90vw;
+            height: 90vh;
         }
         #downloadBtn {
             position: absolute;
@@ -33,7 +36,7 @@
             z-index: 100;
         }
         #downloadBtn:hover {
-            transform: scale(1.05);
+            transform: scale(1.15);
             box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
         }
         #info {
@@ -57,7 +60,7 @@
 </head>
 <body>
     
-    <div id="container"></div>
+    <div id="container">
     
     <button id="downloadBtn">Download STL</button>
     <div id="info">
@@ -68,7 +71,7 @@
         <p>Heights: 3-9 units</p>
         <p>High curvature & twist</p>
     </div>
-
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         const container = document.getElementById('container');
