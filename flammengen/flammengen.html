@@ -10,6 +10,7 @@
             padding: 0;
             overflow: hidden;
             font-family: Arial, sans-serif;
+            font-size: 1.3em;
         }
         #container {
             width: 100vw;
@@ -61,7 +62,7 @@
     <button id="downloadBtn">Download STL</button>
     <div id="info">
         <h1>flammenGenv1</h1>
-    <p>Click refresh for a randomzed shape. Use the button to download a STL file.</p>
+    <p>Click refresh for a randomized shape. Use the button to download a STL file.</p>
         <h3>Grouped Fire Sculpture</h3>
         <p>8 Randomized Flames + Base</p>
         <p>Heights: 3-9 units</p>
@@ -274,7 +275,7 @@
         // Animation
         function animate() {
             requestAnimationFrame(animate);
-            fireGroup.rotation.y += 0.004;
+            fireGroup.rotation.y += 0.001;
 
             flames.forEach((flameObj) => {
                 flameObj.mesh.rotation.y += flameObj.speed;
