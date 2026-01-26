@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Fire Sculpture</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #downloadBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #ff6600, #ff3300);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #downloadBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
+        }
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+        }
+        #info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <button id="downloadBtn">Download STL</button>
+    <div id="info">
+        <h3>Grouped Fire Sculpture</h3>
+        <p>8 Randomized Flames + Base</p>
+        <p>Heights: 3-9 units</p>
+        <p>High curvature & twist</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a2e);
+
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 8, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Function to create a single highly curved flame
+        function createCurvedFlame(offsetX, offsetZ, scale, curveDirection, height, twist, isCenterFlame) {
+            const geometry = new THREE.BufferGeometry();
+            const segments = 8;
+            const vertices = [];
+
+            for (let layer = 0; layer <= segments; layer++) {
+                const t = layer / segments;
+                const y = t * height;
+
+                const radiusBase = scale * (1 - t * 0.9);
+                const wave = Math.sin(t * Math.PI * 2) * 0.2;
+                const radius = radiusBase * (1 + wave);
+
+                let curveAmount = Math.pow(t, 2.5) * scale * 3.5;
+                let curveOffset = curveDirection * curveAmount;
+
+                if (!isCenterFlame && t > 0.4) {
+                    const bendFactor = Math.pow((t - 0.4) / 0.6, 2);
+                    const dx = -offsetX * bendFactor * 0.8;
+                    const dz = -offsetZ * bendFactor * 0.8;
+                    curveOffset += dx;
+                }
+
+                const twistRotation = twist * t * Math.PI;
+
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2 + twistRotation;
+                    let x = Math.cos(angle) * radius + curveOffset + offsetX;
+                    let z = Math.sin(angle) * radius + offsetZ;
+
+                    if (!isCenterFlame && t > 0.4) {
+                        const bendFactor = Math.pow((t - 0.4) / 0.6, 2);
+                        x = x - (x - Math.cos(angle) * radius) * bendFactor * 0.5;
+                        z = z - (z - Math.sin(angle) * radius) * bendFactor * 0.5;
+                    }
+
+                    vertices.push(x, y, z);
+                }
+            }
+
+            const tipY = height;
+            let tipX = offsetX + curveDirection * scale * 3.5;
+            let tipZ = offsetZ;
+
+            if (!isCenterFlame) {
+                tipX = tipX * 0.3;
+                tipZ = tipZ * 0.3;
+            }
+
+            vertices.push(tipX, tipY, tipZ);
+
+            const indices = [];
+
+            for (let layer = 0; layer < segments; layer++) {
+                for (let i = 0; i < 8; i++) {
+                    const next = (i + 1) % 8;
+                    const current = layer * 8 + i;
+                    const currentNext = layer * 8 + next;
+                    const upper = (layer + 1) * 8 + i;
+                    const upperNext = (layer + 1) * 8 + next;
+
+                    indices.push(current, currentNext, upper);
+                    indices.push(currentNext, upperNext, upper);
+                }
+            }
+
+            const tipIndex = vertices.length / 3 - 1;
+            for (let i = 0; i < 8; i++) {
+                const next = (i + 1) % 8;
+                const current = segments * 8 + i;
+                const currentNext = segments * 8 + next;
+                indices.push(current, currentNext, tipIndex);
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        // Create merged base
+        const baseGeometry = new THREE.CylinderGeometry(5, 5.5, 0.5, 16);
+        const baseMaterial = new THREE.MeshPhongMaterial({
+            color: 0x331100,
+            emissive: 0x220000,
+            flatShading: true
+        });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 0.25;
+        scene.add(base);
+
+        const fireGroup = new THREE.Group();
+
+        // Randomize flame configurations
+        const flameConfigs = [];
+
+        // Center flame
+        flameConfigs.push([
+            0,
+            0,
+            1.5 + Math.random() * 0.5,
+            (Math.random() - 0.5) * 0.8,
+            7 + Math.random() * 2,
+            0.8 + Math.random() * 0.8,
+            true
+        ]);
+
+        // Generate 7 random outer flames
+        for (let i = 0; i < 7; i++) {
+            const angle = (i / 7) * Math.PI * 2 + Math.random() * 0.5;
+            const distance = 1.2 + Math.random() * 1.0;
+
+            flameConfigs.push([
+                Math.cos(angle) * distance,
+                Math.sin(angle) * distance,
+                0.8 + Math.random() * 0.7,
+                (Math.random() - 0.5) * 1.5,
+                3 + Math.random() * 4,
+                (Math.random() - 0.5) * 0.8,
+                false
+            ]);
+        }
+
+        const flames = [];
+
+        flameConfigs.forEach(([x, z, scale, curve, height, twist, isCenterFlame], index) => {
+            const geometry = createCurvedFlame(x, z, scale, curve, height, twist, isCenterFlame);
+
+            const hue = 0.04 + Math.random() * 0.03;
+            const saturation = 0.95 + Math.random() * 0.05;
+            const color = new THREE.Color().setHSL(hue, saturation, 0.5);
+            const emissive = new THREE.Color().setHSL(hue - 0.01, 1, 0.35);
+
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: emissive,
+                emissiveIntensity: 0.7,
+                flatShading: true,
+                side: THREE.DoubleSide
+            });
+
+            const flame = new THREE.Mesh(geometry, material);
+
+            const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+            const wireframeMaterial = new THREE.LineBasicMaterial({
+                color: 0xffbb33,
+                linewidth: 1,
+                opacity: 0.5,
+                transparent: true
+            });
+            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+            flame.add(wireframe);
+
+            fireGroup.add(flame);
+            flames.push({
+                mesh: flame,
+                speed: 0.008 + Math.random() * 0.012,
+                baseRotation: Math.random() * Math.PI * 2
+            });
+        });
+
+        scene.add(fireGroup);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 1.8);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xff5500, 4, 100);
+        pointLight1.position.set(0, 6, 0);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xffaa00, 2.5, 80);
+        pointLight2.position.set(5, 5, 5);
+        scene.add(pointLight2);
+
+        const pointLight3 = new THREE.PointLight(0xff3300, 2.5, 80);
+        pointLight3.position.set(-5, 5, -5);
+        scene.add(pointLight3);
+
+        const pointLight4 = new THREE.PointLight(0xff7700, 2, 60);
+        pointLight4.position.set(0, 3, 8);
+        scene.add(pointLight4);
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            fireGroup.rotation.y += 0.004;
+
+            flames.forEach((flameObj) => {
+                flameObj.mesh.rotation.y += flameObj.speed;
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Download STL function
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            let output = 'solid grouped_fire\n';
+
+            scene.traverse((object) => {
+                if (object.isMesh && object.geometry && !object.parent.isLineSegments) {
+                    const geometry = object.geometry;
+                    const positionAttribute = geometry.getAttribute('position');
+                    const index = geometry.index;
+
+                    if (index) {
+                        for (let i = 0; i < index.count; i += 3) {
+                            const a = index.array[i];
+                            const b = index.array[i + 1];
+                            const c = index.array[i + 2];
+
+                            const vA = new THREE.Vector3(
+                                positionAttribute.array[a * 3],
+                                positionAttribute.array[a * 3 + 1],
+                                positionAttribute.array[a * 3 + 2]
+                            );
+                            const vB = new THREE.Vector3(
+                                positionAttribute.array[b * 3],
+                                positionAttribute.array[b * 3 + 1],
+                                positionAttribute.array[b * 3 + 2]
+                            );
+                            const vC = new THREE.Vector3(
+                                positionAttribute.array[c * 3],
+                                positionAttribute.array[c * 3 + 1],
+                                positionAttribute.array[c * 3 + 2]
+                            );
+
+                            object.updateMatrixWorld();
+                            vA.applyMatrix4(object.matrixWorld);
+                            vB.applyMatrix4(object.matrixWorld);
+                            vC.applyMatrix4(object.matrixWorld);
+
+                            const cb = new THREE.Vector3();
+                            const ab = new THREE.Vector3();
+                            cb.subVectors(vC, vB);
+                            ab.subVectors(vA, vB);
+                            cb.cross(ab);
+                            cb.normalize();
+
+                            output += `facet normal ${cb.x} ${cb.y} ${cb.z}\n`;
+                            output += '  outer loop\n';
+                            output += `    vertex ${vA.x} ${vA.y} ${vA.z}\n`;
+                            output += `    vertex ${vB.x} ${vB.y} ${vB.z}\n`;
+                            output += `    vertex ${vC.x} ${vC.y} ${vC.z}\n`;
+                            output += '  endloop\n';
+                            output += 'endfacet\n';
+                        }
+                    }
+                }
+            });
+
+            output += 'endsolid grouped_fire\n';
+
+            try {
+                const blob = new Blob([output], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.href = url;
+                link.download = 'grouped_fire_curved.stl';
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please check browser settings.');
+            }
+        });
+    </script>
+</body>
+</html>
