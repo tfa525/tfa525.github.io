@@ -1,0 +1,45 @@
+a:link{
+          font-size: 2.5em;
+          color:black;
+            text-decoration-line: none;
+}
+a:hover{
+          font-family: 'Courier New';
+          color: darkred;
+            text-decoration-line: underline
+}
+a:visited{
+          font-family: serif;
+          color: red;
+          text-decoration: line-through;
+}
+
+#YUR {
+    background-image: url(images/v1_spin.gif);
+    height: 598px;
+          width: 672px;
+          top: 350px;
+          position: absolute;
+}
+#STARE {
+          
+          background-image: url(images/v1_gif.gif);
+          height: 317px;
+          width: 305px;
+          position: absolute;
+          top: 550px;
+}
+#BOOM {
+          background-image: url(images/explode.gif);
+          width: 220px;
+          height: 314px;
+          position: absolute;
+          top: 400px;;
+          left: 700px;
+}
+#GABBY {
+          background-image: url(images/abriel.png);
+          width: 2000px;
+          height: 2000px;
+          position: absolute;
+}

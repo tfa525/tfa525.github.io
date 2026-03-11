@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Sancreek&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Kings&family=Sancreek&display=swap" rel="stylesheet" />
+        <title>The Acts</title>
+        <style>
+            body {
+                background-color: black;
+                background-image: url(images/jester_animation.gif);
+            }
+            h1 {
+                color: darkgoldenrod;
+                font-family: sancreek;
+                font-size: 50px;
+            }
+            h2 {
+                color: darkgoldenrod;
+                font-family: sancreek;
+                font-size: 50px;
+            }
+            p {
+                color: maroon;
+                font-family: kings;
+                font-size: 20px;
+            }
+            nav {
+                margin: 40px auto;
+                text-align: center;
+            }
+            nav a {
+                color: darkgoldenrod;
+                font-family: sancreek;
+                text-decoration: none;
+                margin: 0 20px;
+                font-size: 45px;
+                transition: 0.2s;
+            }
+            nav a:hover {
+                color: red;
+                text-shadow: 0 0 10px maroon;
+            }
+            .flip-vertical {
+                display: inline-block;
+                transform: scaleY(-1) scalex(-1);
+            }
+            .center-image {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .color-box {
+                background-color: rgba(0, 0, 0, 85%);
+                padding: 10px;
+                border-radius: 5px;
+            }
+            #circus-nav {
+                display: flex;
+                justify-content: center;
+                gap: 40px;
+                margin: 40px 0;
+            }
+            #circus-nav a {
+                position: relative;
+                color: darkgoldenrod;
+                font-size: 25px;
+                text-decoration: none;
+                transition: transform 0.1s;
+                cursor: pointer;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <audio hidden autoplay loop>
+            <source src="images/madhouse_carnival.mp3" />
+        </audio>
+        <nav id="circus-nav">
+            <a href="intro.html">Welcome</a>
+            <a href="texture.html">The Jester</a>
+            <a href="echo.html">The Acts</a>
+        </nav>
+        <h1 class="color-box">Tonight's Featured Performers</h1>
+        <p class="color-box">
+            To night’s per for mance show casesa ca refu llysel ect ed ca st, ea ch ch osenfo rthe ir abi lityto capt iva teand
+            com ply. <b>The Acrobat</b> twi sts thro ughthe a irin pat ter nsno lon gertau ght, ben dingat ang les re fin edthro ugh
+            end less rehe ar sal. <b>The Strongman</b> lif ts wh at sho uldno tbe lif ted, smil ingthro ugh t hestr ain a sif una ware
+            o fthe wei ght’s tr uena ture. <b>The Fire Breather</b> ex hal esa fl ametha tfli ckers be twe enhe at an dhun ger,
+            trai nedto res pon don lyto <b>the ringmaster’s</b> si gn al. The irmove ment sap pe arpra cti ced, ye tso met hing i nthe ir
+            tim ingsug gests insti nctra ther th anch oreo gra phy, a stho ugh <b>the circus itself guides their bodies across
+            the stage.</b>
+        </p>
+        <h2 class="color-box">The Harlequin Greeter</h2>
+        <p class="color-box">
+            <b> The Harlequin Greeter </b>app ears atthe ed geof th erin gto welcome guests wh ore quire add iti onal gui dan ce. Hi s
+            glo vedha ndis ext end edin a gest ureof cou rte sy, invi tingatt ent ionra therth anmov ement. T hepa int ed ma sk
+            he we arspre ser vesa sin gle, prac ti cedex pre ssion, ens uri ngtha tno con fus ion int er rup tsthe fl owof th eper for mance. Tho sesea ted ne are stwil lnot ice th athis pres enceenco urage ssti llne ss an d prop er foc us,
+            ge ntly rem ind ing visi torswhe rethe ybe long wi th inthe te nt. <b>He remains in place until order is restored,
+            serving as both an introduction to the show and a reminder that every role, including the audience’s, has
+            already been arranged.</b>
+        </p>
+        <script>
+            const links = document.querySelectorAll("#circus-nav a");
+
+            document.addEventListener("mousemove", (e) => {
+                links.forEach((link) => {
+                    const rect = link.getBoundingClientRect();
+                    const linkX = rect.left + rect.width / 2;
+                    const linkY = rect.top + rect.height / 2;
+
+                    const dx = e.clientX - linkX;
+                    const dy = e.clientY - linkY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 150) {
+                        const moveX = -dx * 0.3;
+                        const moveY = -dy * 0.3;
+                        link.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                    } else {
+                        link.style.transform = "translate(0,0)";
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,46 @@
+
+body {
+    background-color: rgba(20, 20, 20, 1);
+    color: rgba(225, 255, 225, 0.9);
+    background-image: url(imgs/Page-2.gif);
+    background-size: cover;
+    background-position-x: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+
+.glitch {
+    position: relative;
+    color: white;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0.7;
+}
+
+.glitch::before {
+    color: #ff0000;
+    transform: translate(-2px, 0);
+}
+
+.glitch::after {
+    color: #ffd8d8;
+    transform: translate(2px, 0);
+}
+
+.background-text {
+    position: fixed;
+    font-size: 4rem;
+    opacity: 0.4;
+    color: #7e0000;
+}
+
+
+
