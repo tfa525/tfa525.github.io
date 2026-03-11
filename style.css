@@ -1,0 +1,21 @@
+body {
+    background-color: rgba(20, 20, 20, 1);
+    color: rgba(225, 255, 225, 0.9);
+    background-image: url(imgs/cutecat.gif);
+}
+a:link{
+    font-family: 'Courier New';
+    font-size: 2em;
+    color:teal;
+    text-decoration-line: blink;
+}
+a:hover{
+    font-family: Times;
+    font-size: .5em;
+    color: darkviolet;
+}
+a:visited{
+    font-family: serif;
+    color: blue;
+    text-decoration: underline;
+}
